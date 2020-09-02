@@ -30,8 +30,7 @@ function requestDecorator(method: HttpMethod, endpoint: string, defaults?: Reque
     }
     // Build the Reqeust object based on the defaults and parametas
     const config: AxiosRequestConfig = Reflect.getMetadata(MetadataKey.RequestConfig, target, propertyKey) || {};
-    const interceptors: Interceptors = Reflect.getMetadata(MetadataKey.ReqeustInterceptors, target, propertyKey) || {};
-    const reqeust = new RetroxiosRequest(method, endpoint).extendConfig(config).useInterceptors(interceptors);
+    const reqeust = new RetroxiosRequest(method, endpoint).extendConfig(config);
     if (defaults) {
       defaults.queries && reqeust.addQueries(defaults.queries);
       defaults.headers && reqeust.addHeaders(defaults.headers);
@@ -39,6 +38,8 @@ function requestDecorator(method: HttpMethod, endpoint: string, defaults?: Reque
     const parametas: Parameta[] = Reflect.getMetadata(MetadataKey.RequestParametas, target, propertyKey) || [];
     const paramtypes: FunctionConstructor[] = Reflect.getMetadata("design:paramtypes", target, propertyKey);
     Reflect.defineMetadata(MetadataKey.Request, reqeust.withParametas(parametas, paramtypes), target, propertyKey);
+    // Retrieve interceptors from metadata here for use inside descriptor value
+    const interceptors: Interceptors = Reflect.getMetadata(MetadataKey.Interceptors, target, propertyKey) || {};
     // Modify the descriptor properties and its value to make it execute the request
     descriptor.enumerable = true;
     descriptor.writable = descriptor.configurable = false;
@@ -46,6 +47,15 @@ function requestDecorator(method: HttpMethod, endpoint: string, defaults?: Reque
       // Get the Client object from metadata in runtime rather than in declaration time
       // as the object is defined in Retroxios.create() (after decorators are executed)
       const client: AxiosInstance = Reflect.getMetadata(MetadataKey.Client, target.constructor);
+      // Apply interceptors to Client
+      if (interceptors.request) {
+        const { onFulfilled, onRejected } = interceptors.request;
+        client.interceptors.request.use(onFulfilled, onRejected);
+      }
+      if (interceptors.response) {
+        const { onFulfilled, onRejected } = interceptors.response;
+        client.interceptors.response.use(onFulfilled, onRejected);
+      }
       return await reqeust.build(client)(...args);
     };
   };
@@ -140,7 +150,7 @@ export const Config = (config: AxiosRequestConfig): MethodDecorator => {
  */
 export const Intercept = (interceptors: Interceptors): MethodDecorator => {
   return (target, propertyKey): void => {
-    if (Reflect.hasMetadata(MetadataKey.ReqeustInterceptors, target, propertyKey)) {
+    if (Reflect.hasMetadata(MetadataKey.Interceptors, target, propertyKey)) {
       console.warn("[retroxios] More than one request intercept decorator is repeatedly attached.");
       console.warn("[retroxios] Request intercept decorators attached below this one will get overridden.");
     }
@@ -148,7 +158,7 @@ export const Intercept = (interceptors: Interceptors): MethodDecorator => {
       console.warn("[retroxios] This is an ineffective request intercept decorator.");
       console.warn("[retroxios] Request intercept decorators must be attached below request deocrator.");
     }
-    Reflect.defineMetadata(MetadataKey.ReqeustInterceptors, interceptors, target, propertyKey);
+    Reflect.defineMetadata(MetadataKey.Interceptors, interceptors, target, propertyKey);
   };
 };
 

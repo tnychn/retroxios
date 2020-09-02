@@ -4,8 +4,8 @@ export enum MetadataKey {
   Client = "retroxios:client",
   Request = "retroxios:request",
   RequestConfig = "retroxios:request/config",
-  ReqeustInterceptors = "retroxios:request/interceptors",
   RequestParametas = "retroxios:request/parametas",
+  Interceptors = "retroxios:interceptors",
 }
 
 export enum HttpMethod {
