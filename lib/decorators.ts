@@ -1,7 +1,7 @@
 import { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 
 import RetroxiosRequest from "./request";
-import { MetadataKey, HttpMethod, Paramerator, Parameta, Queries, Headers } from "./entities";
+import { MetadataKey, HttpMethod, Paramerator, Parameta, Queries, Headers, Interceptors } from "./entities";
 
 /**
  * This should be returned in every method with request decorator attached.
@@ -30,7 +30,8 @@ function requestDecorator(method: HttpMethod, endpoint: string, defaults?: Reque
     }
     // Build the Reqeust object based on the defaults and parametas
     const config: AxiosRequestConfig = Reflect.getMetadata(MetadataKey.RequestConfig, target, propertyKey) || {};
-    const reqeust = new RetroxiosRequest(method, endpoint).extendConfig(config);
+    const interceptors: Interceptors = Reflect.getMetadata(MetadataKey.ReqeustInterceptors, target, propertyKey) || {};
+    const reqeust = new RetroxiosRequest(method, endpoint).extendConfig(config).useInterceptors(interceptors);
     if (defaults) {
       defaults.queries && reqeust.addQueries(defaults.queries);
       defaults.headers && reqeust.addHeaders(defaults.headers);
@@ -129,6 +130,25 @@ export const Config = (config: AxiosRequestConfig): MethodDecorator => {
       console.warn("[retroxios] Request config decorators must be attached below request deocrator.");
     }
     Reflect.defineMetadata(MetadataKey.RequestConfig, config, target, propertyKey);
+  };
+};
+
+/**
+ * Supply request/response interceptor(s) for this particular request only.
+ *
+ * @param interceptors - The request/response interceptor(s) to be applied
+ */
+export const Intercept = (interceptors: Interceptors): MethodDecorator => {
+  return (target, propertyKey): void => {
+    if (Reflect.hasMetadata(MetadataKey.ReqeustInterceptors, target, propertyKey)) {
+      console.warn("[retroxios] More than one request intercept decorator is repeatedly attached.");
+      console.warn("[retroxios] Request intercept decorators attached below this one will get overridden.");
+    }
+    if (Reflect.hasMetadata(MetadataKey.Request, target, propertyKey)) {
+      console.warn("[retroxios] This is an ineffective request intercept decorator.");
+      console.warn("[retroxios] Request intercept decorators must be attached below request deocrator.");
+    }
+    Reflect.defineMetadata(MetadataKey.ReqeustInterceptors, interceptors, target, propertyKey);
   };
 };
 

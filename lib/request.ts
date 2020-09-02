@@ -1,6 +1,6 @@
 import { AxiosInstance, AxiosRequestConfig, AxiosResponse, Method } from "axios";
 
-import { Headers, Paramerator, Parameta, Queries } from "./entities";
+import { Paramerator, Parameta, Queries, Headers, Interceptors } from "./entities";
 
 const pathRegExp = (key: string): RegExp => new RegExp(`{${key}(?:=\\((.+)\\))?}`);
 
@@ -9,6 +9,7 @@ type Requester = (...args: any[]) => Promise<AxiosResponse>;
 export default class RetroxiosRequest {
   private parametas: Parameta[] = [];
   private config: AxiosRequestConfig = {};
+  private interceptors: Interceptors = {};
 
   public constructor(method: Method, endpoint: string) {
     this.config.method = method;
@@ -25,6 +26,11 @@ export default class RetroxiosRequest {
 
   public extendConfig(config: AxiosRequestConfig): RetroxiosRequest {
     this.config = { ...this.config, ...config };
+    return this;
+  }
+
+  public useInterceptors(interceptors: Interceptors): RetroxiosRequest {
+    this.interceptors = interceptors;
     return this;
   }
 
@@ -99,6 +105,8 @@ export default class RetroxiosRequest {
   }
 
   public build(client: AxiosInstance): Requester {
+    client.interceptors.request.use(this.interceptors.request?.onFulfilled, this.interceptors.request?.onRejected);
+    client.interceptors.response.use(this.interceptors.response?.onFulfilled, this.interceptors.response?.onRejected);
     return async (...args: any[]): Promise<AxiosResponse> => {
       this.mapParametas(...args);
       return await client.request(this.config);
