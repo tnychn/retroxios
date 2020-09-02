@@ -18,12 +18,12 @@ class TraktService {
   });
 
   public movie(id: string): TraktMovie {
-    const baseURL = `${TraktService.BASE_URL}/movies/${id}`;
+    const baseURL = `${TraktService.BASE_URL}movies/${id}`;
     return this.retroxious.extend({ baseURL }).create(TraktMovie);
   }
 
   public get movies(): TraktMovies {
-    const baseURL = `${TraktService.BASE_URL}/movies/`;
+    const baseURL = `${TraktService.BASE_URL}movies/`;
     return this.retroxious.extend({ baseURL }).create(TraktMovies);
   }
 }
