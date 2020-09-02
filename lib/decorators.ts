@@ -167,6 +167,12 @@ export const Intercept = (interceptors: Interceptors): MethodDecorator => {
   };
 };
 
+/**
+ * Apply a manipulation to the response of the request and returns whatever the manipulator returns.
+ * It can be used to customize or even change what the reqeust method will return.
+ *
+ * @param manipulator - The manipulator function to be applied to the response
+ */
 export function Manipulate<T>(manipulator: Manipulator<T>): MethodDecorator {
   return (target, propertyKey): void => {
     if (Reflect.hasMetadata(MetadataKey.Manipulator, target, propertyKey)) {
