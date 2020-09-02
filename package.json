@@ -2,7 +2,13 @@
   "name": "retroxios",
   "version": "0.2.0",
   "description": "A type-safe HTTP client for Node.js and browsers",
-  "keywords": ["library", "decorators", "http", "axios", "retrofit"],
+  "keywords": [
+    "library",
+    "decorators",
+    "http",
+    "axios",
+    "retrofit"
+  ],
   "repository": "github:strmbx/retroxios",
   "author": {
     "name": "Tony Chan",
@@ -13,7 +19,11 @@
   "private": false,
   "main": "build/lib/index.js",
   "types": "build/lib/index.d.ts",
-  "files": ["build/lib","README.md", "LICENSE.txt"],
+  "files": [
+    "build/lib",
+    "README.md",
+    "LICENSE.txt"
+  ],
   "scripts": {
     "prepare": "tsc"
   },
