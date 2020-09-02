@@ -90,8 +90,9 @@ $ yarn add retroxios
   - [Query Manipulation](#query-manipulation)
   - [Header Manipulation](#header-manipulation)
   - [Request Body](#request-body)
-  - [Per Request Config]()
-  - [Per Request Interceptors]()
+  - [Per Request Config](#per-request-config)
+  - [Per Request Interceptors](#per-request-interceptors)
+- [Response Manipulator](#response-manipulator)
 - [Returning `nothing()`](#returning-nothing)
 - [Builder Configurations](#builder-configurations)
 
@@ -254,6 +255,47 @@ public async getUserPosts(): Promise<AxiosResponse> {
 These interceptors will override those specified in the [`Retroxios`](#builder-configurations) object.
 
 Note that this decorator should only be attached once per method.
+
+---
+
+### Response Manipulator
+
+The `@Manipulate()` method decorator allows you to manipulate the response or
+even change the return type of the decorated request method (such as wrap the response in another object etc.).
+
+```typescript
+@GET("user/posts")
+@Manipulate((response: AxiosResponse): string => response.statusText})
+public async getUserPosts(): Promise<string> {
+  return nothing();
+};
+```
+
+Note that this decorator should only be attached once per method.
+
+#### Difference with Response Interceptor
+
+```typescript
+export type Interceptor<AxiosResponse> = {
+  onFulfilled?: (value: AxiosResponse) => AxiosResponse | Promise<AxiosResponse>;
+  onRejected?: (error: any) => any;
+};
+```
+
+As you can see, `onFulfilled` requires you to return an `AxiosResponse` (or its promised variant).
+This means you cannot control what you want to get freely. Having said that, interceptors are quite useful in some other cases.
+
+#### Difference with `AxiosTransformer`
+
+```typescript
+export interface AxiosTransformer {
+  (data: any, headers?: any): any;
+}
+// Declaration from 'axios/index.d.ts'
+```
+
+As you may already noticed, `AxiosTransformer` does not receive the whole response as the parameter,
+instead it receives only the data and the headers of the response. Therefore, its capability is limited comapred with `@Manipulate()`.
 
 ---
 
