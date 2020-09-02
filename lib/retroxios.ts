@@ -7,7 +7,7 @@ import { MetadataKey } from "./entities";
  * based on an axios instance created from the config given.
  */
 export default class Retroxios {
-  private readonly client: AxiosInstance;
+  private readonly client: AxiosInstance; // TODO: should expose client to allow low-level configurations
 
   /**
    * @param config - The base config to create the internal axios instance
@@ -35,7 +35,10 @@ export default class Retroxios {
    */
   public extend(config: AxiosRequestConfig): Retroxios {
     config = { ...this.config, ...config };
-    return new Retroxios(config);
+    const instance = new Retroxios(config);
+    instance.interceptors.request = this.interceptors.request;
+    instance.interceptors.response = this.interceptors.response;
+    return instance;
   }
 
   /**
