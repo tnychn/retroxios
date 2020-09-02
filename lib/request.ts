@@ -105,8 +105,12 @@ export default class RetroxiosRequest {
   }
 
   public build(client: AxiosInstance): Requester {
-    client.interceptors.request.use(this.interceptors.request?.onFulfilled, this.interceptors.request?.onRejected);
-    client.interceptors.response.use(this.interceptors.response?.onFulfilled, this.interceptors.response?.onRejected);
+    if (this.interceptors.request) {
+      client.interceptors.request.use(this.interceptors.request.onFulfilled, this.interceptors.request.onRejected);
+    }
+    if (this.interceptors.response) {
+      client.interceptors.response.use(this.interceptors.response?.onFulfilled, this.interceptors.response?.onRejected);
+    }
     return async (...args: any[]): Promise<AxiosResponse> => {
       this.mapParametas(...args);
       return await client.request(this.config);
