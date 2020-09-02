@@ -67,7 +67,9 @@ $ yarn add retroxios
 
 ## Usage
 
-TODO
+**TODO**
+
+More [examples](./examples) here.
 
 ## Contributing
 
