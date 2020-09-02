@@ -108,7 +108,7 @@ import * as decorators from "retroxios/decorators";
 
 ### Request Decorators
 
-> Supprt HTTP `GET`, `HEAD`, `POST`, `PUT`, `DELETE`, `OPTIONS` and `PATCH` methods.
+> Support HTTP `GET`, `HEAD`, `POST`, `PUT`, `DELETE`, `OPTIONS` and `PATCH` methods.
 
 The relative endpoint of the URL is specified as the first parameter in the decorator.
 
@@ -222,7 +222,7 @@ Note that this decorator is only allowed when using the `POST`, `PUT` and `PATCH
 
 #### Per Request Config
 
-You can supply an additonal config (`AxiosRequestConfig`) for a particular request like this:
+You can supply an additional config (`AxiosRequestConfig`) for a particular request like this:
 
 ```typescript
 @GET("user/posts")
@@ -264,7 +264,7 @@ Note that this decorator should only be attached once per method.
 All methods decorated with any [request decorator](#request-decorators) are recommended to return `nothing()`.
 
 Since these methods do not have a body and have nothing to return, linters such as `eslint` would complain
-about returning `void` cannont assign to the method's return type `Promise<AxiosResponse<T>>`.
+about returning `void` cannot assign to the method's return type `Promise<AxiosResponse<T>>`.
 Therefore, returning `nothing()` can eliminate these warnings.
 
 Moreover, due to the same reason, the parameters passed to the decorated method are unused.
