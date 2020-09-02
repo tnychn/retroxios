@@ -1,7 +1,7 @@
-import { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
+import { AxiosInstance, AxiosRequestConfig } from "axios";
 
 import RetroxiosRequest from "./request";
-import { MetadataKey, HttpMethod, Paramerator, Parameta, Queries, Headers, Interceptors } from "./entities";
+import { MetadataKey, HttpMethod, Paramerator, Parameta, Queries, Headers, Interceptors, Manipulator } from "./entities";
 
 /**
  * This should be returned in every method with request decorator attached.
@@ -40,11 +40,13 @@ function requestDecorator(method: HttpMethod, endpoint: string, defaults?: Reque
     Reflect.defineMetadata(MetadataKey.Request, reqeust.withParametas(parametas, paramtypes), target, propertyKey);
     // Retrieve interceptors from metadata here for use inside descriptor value
     const interceptors: Interceptors = Reflect.getMetadata(MetadataKey.Interceptors, target, propertyKey) || {};
+    // Retrieve response manipulator from metadata for later use
+    const manipulator: Manipulator | undefined = Reflect.getMetadata(MetadataKey.Manipulator, target, propertyKey);
     // Modify the descriptor properties and its value to make it execute the request
     descriptor.enumerable = true;
     descriptor.writable = descriptor.configurable = false;
-    descriptor.value = async function (...args: any[]): Promise<AxiosResponse> {
-      // Get the Client object from metadata in runtime rather than in declaration time
+    descriptor.value = async function (...args: any[]): Promise<unknown> {
+      // Retrieve the Client object from metadata in runtime rather than in declaration time
       // as the object is defined in Retroxios.create() (after decorators are executed)
       const client: AxiosInstance = Reflect.getMetadata(MetadataKey.Client, target.constructor);
       // Apply interceptors to Client
@@ -56,7 +58,10 @@ function requestDecorator(method: HttpMethod, endpoint: string, defaults?: Reque
         const { onFulfilled, onRejected } = interceptors.response;
         client.interceptors.response.use(onFulfilled, onRejected);
       }
-      return await reqeust.build(client)(...args);
+      const response = await reqeust.build(client)(...args);
+      // Apply manipulator to the response
+      if (!manipulator) return response;
+      return manipulator(response);
     };
   };
 }
@@ -161,6 +166,20 @@ export const Intercept = (interceptors: Interceptors): MethodDecorator => {
     Reflect.defineMetadata(MetadataKey.Interceptors, interceptors, target, propertyKey);
   };
 };
+
+export function Manipulate<T>(manipulator: Manipulator<T>): MethodDecorator {
+  return (target, propertyKey): void => {
+    if (Reflect.hasMetadata(MetadataKey.Manipulator, target, propertyKey)) {
+      console.warn("[retroxios] More than one response manipulate decorator is repeatedly attached.");
+      console.warn("[retroxios] Response manipulate decorators attached below this one will get overridden.");
+    }
+    if (Reflect.hasMetadata(MetadataKey.Request, target, propertyKey)) {
+      console.warn("[retroxios] This is an ineffective response manipulate decorator.");
+      console.warn("[retroxios] Response manipulate decorators must be attached below request deocrator.");
+    }
+    Reflect.defineMetadata(MetadataKey.Manipulator, manipulator, target, propertyKey);
+  };
+}
 
 function addMetadataParametas(target: object, propertyKey: string | symbol, parameta: Parameta): void {
   if (!Reflect.hasMetadata(MetadataKey.RequestParametas, target, propertyKey))

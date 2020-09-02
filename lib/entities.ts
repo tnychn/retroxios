@@ -6,6 +6,7 @@ export enum MetadataKey {
   RequestConfig = "retroxios:request/config",
   RequestParametas = "retroxios:request/parametas",
   Interceptors = "retroxios:interceptors",
+  Manipulator = "retroxios:manipulator",
 }
 
 export enum HttpMethod {
@@ -42,3 +43,5 @@ export type Interceptors = {
   request?: Interceptor<AxiosRequestConfig>;
   response?: Interceptor<AxiosResponse>;
 };
+
+export type Manipulator<T = any> = (response: AxiosResponse) => T;
