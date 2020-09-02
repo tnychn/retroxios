@@ -15,8 +15,7 @@
   "types": "build/index.d.ts",
   "files": ["lib", "build"],
   "scripts": {
-    "build": "tsc",
-    "prepare": "yarn run build"
+    "prepare": "tsc"
   },
   "dependencies": {
     "axios": "^0.19.2",
