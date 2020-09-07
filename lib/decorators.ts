@@ -18,30 +18,35 @@ type RequestDecoratorDefaults = { queries?: Queries; headers?: Headers };
 function requestDecorator(method: HttpMethod, endpoint: string, defaults?: RequestDecoratorDefaults): MethodDecorator {
   // TODO: something to do with the original method value?
   return (target, propertyKey, descriptor: PropertyDescriptor): void => {
-    // Warn if any request method decorator is already attached
+    // Print warnings if applicable
     if (Reflect.hasMetadata(MetadataKey.Request, target, propertyKey)) {
       console.warn("[retroxios] More than one request decorator is repeatedly attached.");
       console.warn("[retroxios] Request decorators attached below this one will get overridden.");
     }
-    // Warn if defaults are specified and any request config decorator is already attached at the same time
     if (defaults && Reflect.hasMetadata(MetadataKey.RequestConfig, target, propertyKey)) {
       console.warn("[retroxios] Defaults should not be specified when a request config decorator is attached.");
       console.warn("[retroxios] Some properties specified by the request config decorator will get overridden by defaults.");
     }
-    // Build the Reqeust object based on the defaults and parametas
-    const config: AxiosRequestConfig = Reflect.getMetadata(MetadataKey.RequestConfig, target, propertyKey) || {};
-    const reqeust = new RetroxiosRequest(method, endpoint).extendConfig(config);
-    if (defaults) {
-      defaults.queries && reqeust.addQueries(defaults.queries);
-      defaults.headers && reqeust.addHeaders(defaults.headers);
-    }
+
+    // Retrieve all needed metadata
     const parametas: Parameta[] = Reflect.getMetadata(MetadataKey.RequestParametas, target, propertyKey) || [];
     const paramtypes: FunctionConstructor[] = Reflect.getMetadata("design:paramtypes", target, propertyKey);
-    Reflect.defineMetadata(MetadataKey.Request, reqeust.withParametas(parametas, paramtypes), target, propertyKey);
-    // Retrieve interceptors from metadata here for use inside descriptor value
+    // - @Config
+    const config: AxiosRequestConfig = Reflect.getMetadata(MetadataKey.RequestConfig, target, propertyKey) || {};
+    // - @Intercept
     const interceptors: Interceptors = Reflect.getMetadata(MetadataKey.Interceptors, target, propertyKey) || {};
-    // Retrieve response manipulator from metadata for later use
+    // - @Manipulate
     const manipulator: Manipulator | undefined = Reflect.getMetadata(MetadataKey.Manipulator, target, propertyKey);
+
+    // Build the generic Request object
+    const request = new RetroxiosRequest(method, endpoint).extendConfig(config);
+    if (defaults) {
+      defaults.queries && request.addQueries(defaults.queries);
+      defaults.headers && request.addHeaders(defaults.headers);
+    }
+    request.withParametas(parametas, paramtypes);
+    Reflect.defineMetadata(MetadataKey.Request, request, target, propertyKey);
+
     // Modify the descriptor properties and its value to make it execute the request
     descriptor.enumerable = true;
     descriptor.writable = descriptor.configurable = false;
@@ -58,7 +63,11 @@ function requestDecorator(method: HttpMethod, endpoint: string, defaults?: Reque
         const { onFulfilled, onRejected } = interceptors.response;
         client.interceptors.response.use(onFulfilled, onRejected);
       }
-      const response = await reqeust.build(client)(...args);
+      // Clone the Request object first before building to avoid side effects on the generic one
+      const req = request.clone();
+      // Build and call the Request object with the client and arguments
+      const call = req.build(client);
+      const response = await call(...args);
       // Apply manipulator to the response
       if (!manipulator) return response;
       return manipulator(response);

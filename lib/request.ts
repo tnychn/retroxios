@@ -10,6 +10,11 @@ export default class RetroxiosRequest {
   private parametas: Parameta[] = [];
   private _config: AxiosRequestConfig = {};
 
+  public static fromConfig(config: AxiosRequestConfig): RetroxiosRequest {
+    if (!(config.method && config.url)) throw new Error();
+    return new RetroxiosRequest(config.method, config.url);
+  }
+
   public constructor(method: Method, endpoint: string) {
     this._config.method = method;
     this._config.url = endpoint;
@@ -107,5 +112,11 @@ export default class RetroxiosRequest {
       this.mapParametas(...args);
       return await client.request(this._config);
     };
+  }
+
+  public clone(): RetroxiosRequest {
+    const request = RetroxiosRequest.fromConfig(this._config);
+    request.parametas = this.parametas;
+    return request;
   }
 }
