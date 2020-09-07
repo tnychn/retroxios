@@ -8,23 +8,27 @@ type Requester = (...args: any[]) => Promise<AxiosResponse>;
 
 export default class RetroxiosRequest {
   private parametas: Parameta[] = [];
-  private config: AxiosRequestConfig = {};
+  private _config: AxiosRequestConfig = {};
 
   public constructor(method: Method, endpoint: string) {
-    this.config.method = method;
-    this.config.url = endpoint;
+    this._config.method = method;
+    this._config.url = endpoint;
+  }
+
+  public get config(): AxiosRequestConfig {
+    return this._config;
   }
 
   public addQueries(queries: Queries): void {
-    this.config.params = { ...this.config.params, ...queries };
+    this._config.params = { ...this._config.params, ...queries };
   }
 
   public addHeaders(headers: Headers): void {
-    this.config.headers = { ...this.config.headers, ...headers };
+    this._config.headers = { ...this._config.headers, ...headers };
   }
 
   public extendConfig(config: AxiosRequestConfig): RetroxiosRequest {
-    this.config = { ...this.config, ...config };
+    this._config = { ...this._config, ...config };
     return this;
   }
 
@@ -47,7 +51,7 @@ export default class RetroxiosRequest {
     const pathParametas = this.parametas.filter((parameta) => parameta.operator === Paramerator.Path);
     for (const pathParameta of pathParametas) {
       const key = pathParameta.key;
-      const match = this.config.url?.match(pathRegExp(key as string));
+      const match = this._config.url?.match(pathRegExp(key as string));
       if (!match) throw new Error(`Unable to find corresponding path key for '${key}'`);
     }
     return this;
@@ -63,29 +67,29 @@ export default class RetroxiosRequest {
       case Paramerator.Path: {
         // arg: >> string
         const regexp = pathRegExp(key as string);
-        const defaultPath = this.config.url?.match(regexp)?.[1];
-        this.config.url = this.config.url?.replace(regexp, String(arg !== undefined ? arg : defaultPath || ""));
+        const defaultPath = this._config.url?.match(regexp)?.[1];
+        this._config.url = this._config.url?.replace(regexp, String(arg !== undefined ? arg : defaultPath || ""));
         break;
       }
       case Paramerator.Query:
         // arg: any
-        this.config.params[key as string] = arg;
+        this._config.params[key as string] = arg;
         break;
       case Paramerator.QuerySpread:
         // arg: object (or any spreadable types)
-        this.config.params = { ...this.config.params, ...arg };
+        this._config.params = { ...this._config.params, ...arg };
         break;
       case Paramerator.Header:
         // arg: >> string
-        this.config.headers[key as string] = String(arg);
+        this._config.headers[key as string] = String(arg);
         break;
       case Paramerator.HeaderSpread:
         // arg: object (or any spreadable types)
-        this.config.headers = { ...this.config.headers, ...arg };
+        this._config.headers = { ...this._config.headers, ...arg };
         break;
       case Paramerator.Body:
         // arg: any
-        this.config.data = arg;
+        this._config.data = arg;
         break;
     }
   }
@@ -101,7 +105,7 @@ export default class RetroxiosRequest {
   public build(client: AxiosInstance): Requester {
     return async (...args: any[]): Promise<AxiosResponse> => {
       this.mapParametas(...args);
-      return await client.request(this.config);
+      return await client.request(this._config);
     };
   }
 }
