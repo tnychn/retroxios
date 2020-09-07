@@ -225,6 +225,6 @@ export const HeaderSpread: ParameterDecorator = (target, propertyKey, parameterI
 /**
  * A parameter decorator that sets the data body of the request to the value of the parameter.
  */
-export const Booy: ParameterDecorator = (target, propertyKey, parameterIndex): void => {
+export const Body: ParameterDecorator = (target, propertyKey, parameterIndex): void => {
   addMetadataParametas(target, propertyKey, { operator: Paramerator.Body, index: parameterIndex });
 };
