@@ -91,7 +91,6 @@ $ yarn add retroxios
   - [Header Manipulation](#header-manipulation)
   - [Request Body](#request-body)
   - [Per Request Config](#per-request-config)
-  - [Per Request Interceptors](#per-request-interceptors)
 - [Response Manipulator](#response-manipulator)
 - [Returning `nothing()`](#returning-nothing)
 - [Builder Configurations](#builder-configurations)
@@ -128,7 +127,7 @@ if there is no corresponding parameters or when they are `undefined`.
 ```
 
 Note that these are method decorators and must be
-placed **above** the [`@Config()`](#per-request-config) and [`@Intercept()`](#per-request-interceptors) method decorators.
+placed **above** the [`@Config()`](#per-request-config) method decorator (if any).
 Also, these decorators should not be attached to the same method more than once.
 
 The methods attached with these decorators should be an `async` function that
@@ -234,25 +233,6 @@ public async getUserPosts(): Promise<AxiosResponse> {
 ```
 
 Some properties such as `url`, `params`, `headers` and `data` may get overridden by decorated parameters.
-
-Note that this decorator should only be attached once per method.
-
-#### Per Request Interceptors
-
-You can supply interceptor(s) for a particular request like this:
-
-```typescript
-@GET("user/posts")
-@Intercept({
-  request: MyRequestInterceptor,
-  response: MyResponseInterceptor,
-})
-public async getUserPosts(): Promise<AxiosResponse> {
-  return nothing();
-};
-```
-
-These interceptors will override those specified in the [`Retroxios`](#builder-configurations) object.
 
 Note that this decorator should only be attached once per method.
 
