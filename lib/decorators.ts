@@ -6,7 +6,7 @@ import { MetadataKey, HttpMethod, Paramerator, Parameta, Queries, Headers, Inter
 /**
  * This should be returned in every method with request decorator attached.
  * Since those methods should do nothing other than acting like type annotation of the HTTP request, there is nothing to return.
- * This solves the problem of returning void in a method with reqeust decorator attached.
+ * This solves the problem of returning void in a method with request decorator attached.
  *
  * @param _args - All arguments passed to the method should be put here to eliminate `unused parameter` warnings of linters
  */
@@ -178,7 +178,7 @@ export const Intercept = (interceptors: Interceptors): MethodDecorator => {
 
 /**
  * Apply a manipulation to the response of the request and returns whatever the manipulator returns.
- * It can be used to customize or even change what the reqeust method will return.
+ * It can be used to customize or even change what the request method will return.
  *
  * @param manipulator - The manipulator function to be applied to the response
  */
@@ -206,7 +206,7 @@ function addMetadataParametas(target: object, propertyKey: string | symbol, para
 /**
  * A parameter decorator that maps a segment in the path of the request URL endpoint to the value of the parameter according to the `key`.
  *
- * @param key - The corresponding alphanumeric key which is specified in the target URL endpoint given in the reqeust decorator
+ * @param key - The corresponding alphanumeric key which is specified in the target URL endpoint given in the request decorator
  */
 export const Path = (key: string): ParameterDecorator => {
   if (key.trim() === "") throw new Error("Key must not be empty");
@@ -246,14 +246,14 @@ export const Header = (key: string): ParameterDecorator => {
 };
 
 /**
- * A parameter decorator that spreads the value of the parameter as multiple header entries to the reqeust.
+ * A parameter decorator that spreads the value of the parameter as multiple header entries to the request.
  */
 export const HeaderSpread: ParameterDecorator = (target, propertyKey, parameterIndex): void => {
   addMetadataParametas(target, propertyKey, { operator: Paramerator.HeaderSpread, index: parameterIndex });
 };
 
 /**
- * A parameter decorator that sets the data body of the reqeust to the value of the parameter.
+ * A parameter decorator that sets the data body of the request to the value of the parameter.
  */
 export const Booy: ParameterDecorator = (target, propertyKey, parameterIndex): void => {
   addMetadataParametas(target, propertyKey, { operator: Paramerator.Body, index: parameterIndex });
