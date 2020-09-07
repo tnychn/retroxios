@@ -232,9 +232,10 @@ public async getUserPosts(): Promise<AxiosResponse> {
 };
 ```
 
-Some properties such as `url`, `params`, `headers` and `data` may get overridden by decorated parameters.
+Some options such as `url`, `params`, `headers` and `data` may get overridden by decorated parameters.
 
-Note that this decorator should only be attached once per method.
+Note that this decorator should only be attached once per method and should not be used
+when `defaults` arguments are supplied to the reqeust decorator at the same time.
 
 ---
 
@@ -308,6 +309,9 @@ const baseBuilder = new Retroxios(baseConfig);
 
 const baseService = baseBuilder.create(ExampleBaseService);
 ```
+
+Note that some options in the config (such as `url`, `params`, `headers` and `data`) supplied to
+the `Retroxios` object may get overridden by the same options specified in the request decorators.
 
 Additionally, you can supply interceptors like this:
 
