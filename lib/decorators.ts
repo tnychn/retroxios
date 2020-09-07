@@ -34,9 +34,9 @@ function requestDecorator(method: HttpMethod, endpoint: string, defaults?: Reque
     // - @Config
     const config: AxiosRequestConfig = Reflect.getMetadata(MetadataKey.RequestConfig, target, propertyKey) || {};
     // - @Intercept
-    const interceptors: Interceptors = Reflect.getMetadata(MetadataKey.Interceptors, target, propertyKey) || {};
+    const interceptors: Interceptors = Reflect.getMetadata(MetadataKey.MethodInterceptors, target, propertyKey) || {};
     // - @Manipulate
-    const manipulator: Manipulator | undefined = Reflect.getMetadata(MetadataKey.Manipulator, target, propertyKey);
+    const manipulator: Manipulator | undefined = Reflect.getMetadata(MetadataKey.MethodManipulator, target, propertyKey);
 
     // Build the generic Request object
     const request = new RetroxiosRequest(method, endpoint).extendConfig(config);
@@ -164,7 +164,7 @@ export const Config = (config: AxiosRequestConfig): MethodDecorator => {
  */
 export const Intercept = (interceptors: Interceptors): MethodDecorator => {
   return (target, propertyKey): void => {
-    if (Reflect.hasMetadata(MetadataKey.Interceptors, target, propertyKey)) {
+    if (Reflect.hasMetadata(MetadataKey.MethodInterceptors, target, propertyKey)) {
       console.warn("[retroxios] More than one request intercept decorator is repeatedly attached.");
       console.warn("[retroxios] Request intercept decorators attached below this one will get overridden.");
     }
@@ -172,7 +172,7 @@ export const Intercept = (interceptors: Interceptors): MethodDecorator => {
       console.warn("[retroxios] This is an ineffective request intercept decorator.");
       console.warn("[retroxios] Request intercept decorators must be attached below request deocrator.");
     }
-    Reflect.defineMetadata(MetadataKey.Interceptors, interceptors, target, propertyKey);
+    Reflect.defineMetadata(MetadataKey.MethodInterceptors, interceptors, target, propertyKey);
   };
 };
 
@@ -184,7 +184,7 @@ export const Intercept = (interceptors: Interceptors): MethodDecorator => {
  */
 export function Manipulate<T>(manipulator: Manipulator<T>): MethodDecorator {
   return (target, propertyKey): void => {
-    if (Reflect.hasMetadata(MetadataKey.Manipulator, target, propertyKey)) {
+    if (Reflect.hasMetadata(MetadataKey.MethodManipulator, target, propertyKey)) {
       console.warn("[retroxios] More than one response manipulate decorator is repeatedly attached.");
       console.warn("[retroxios] Response manipulate decorators attached below this one will get overridden.");
     }
@@ -192,7 +192,7 @@ export function Manipulate<T>(manipulator: Manipulator<T>): MethodDecorator {
       console.warn("[retroxios] This is an ineffective response manipulate decorator.");
       console.warn("[retroxios] Response manipulate decorators must be attached below request deocrator.");
     }
-    Reflect.defineMetadata(MetadataKey.Manipulator, manipulator, target, propertyKey);
+    Reflect.defineMetadata(MetadataKey.MethodManipulator, manipulator, target, propertyKey);
   };
 }
 
