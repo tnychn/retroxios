@@ -1,7 +1,7 @@
 import { AxiosInstance, AxiosRequestConfig } from "axios";
 
 import RetroxiosRequest from "./request";
-import { MetadataKey, HttpMethod, Paramerator, Parameta, Queries, Headers, Interceptors, Manipulator } from "./entities";
+import { MetadataKey, HttpMethod, Paramerator, Parameta, Queries, Headers, Manipulator } from "./entities";
 
 /**
  * This should be returned in every method with request decorator attached.
@@ -33,8 +33,6 @@ function requestDecorator(method: HttpMethod, endpoint: string, defaults?: Reque
     const paramtypes: FunctionConstructor[] = Reflect.getMetadata("design:paramtypes", target, propertyKey);
     // - @Config
     const config: AxiosRequestConfig = Reflect.getMetadata(MetadataKey.RequestConfig, target, propertyKey) || {};
-    // - @Intercept
-    const interceptors: Interceptors = Reflect.getMetadata(MetadataKey.MethodInterceptors, target, propertyKey) || {};
     // - @Manipulate
     const manipulator: Manipulator | undefined = Reflect.getMetadata(MetadataKey.MethodManipulator, target, propertyKey);
 
@@ -54,15 +52,6 @@ function requestDecorator(method: HttpMethod, endpoint: string, defaults?: Reque
       // Retrieve the Client object from metadata in runtime rather than in declaration time
       // as the object is defined in Retroxios.create() (after decorators are executed)
       const client: AxiosInstance = Reflect.getMetadata(MetadataKey.Client, target.constructor);
-      // Apply interceptors to Client
-      if (interceptors.request) {
-        const { onFulfilled, onRejected } = interceptors.request;
-        client.interceptors.request.use(onFulfilled, onRejected);
-      }
-      if (interceptors.response) {
-        const { onFulfilled, onRejected } = interceptors.response;
-        client.interceptors.response.use(onFulfilled, onRejected);
-      }
       // Clone the Request object first before building to avoid side effects on the generic one
       const req = request.clone();
       // Build and call the Request object with the client and arguments
@@ -154,25 +143,6 @@ export const Config = (config: AxiosRequestConfig): MethodDecorator => {
       console.warn("[retroxios] Request config decorators must be attached below request deocrator.");
     }
     Reflect.defineMetadata(MetadataKey.RequestConfig, config, target, propertyKey);
-  };
-};
-
-/**
- * Supply request/response interceptor(s) for this particular request only.
- *
- * @param interceptors - The request/response interceptor(s) to be applied
- */
-export const Intercept = (interceptors: Interceptors): MethodDecorator => {
-  return (target, propertyKey): void => {
-    if (Reflect.hasMetadata(MetadataKey.MethodInterceptors, target, propertyKey)) {
-      console.warn("[retroxios] More than one request intercept decorator is repeatedly attached.");
-      console.warn("[retroxios] Request intercept decorators attached below this one will get overridden.");
-    }
-    if (Reflect.hasMetadata(MetadataKey.Request, target, propertyKey)) {
-      console.warn("[retroxios] This is an ineffective request intercept decorator.");
-      console.warn("[retroxios] Request intercept decorators must be attached below request deocrator.");
-    }
-    Reflect.defineMetadata(MetadataKey.MethodInterceptors, interceptors, target, propertyKey);
   };
 };
 
