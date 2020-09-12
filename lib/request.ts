@@ -8,7 +8,7 @@ type Requester = (...args: any[]) => Promise<AxiosResponse>;
 
 export default class RetroxiosRequest {
   private parametas: Parameta[] = [];
-  private _config: AxiosRequestConfig = {};
+  private _config: AxiosRequestConfig = { params: {}, headers: {} };
 
   public static fromConfig(config: AxiosRequestConfig): RetroxiosRequest {
     if (!(config.method && config.url)) throw new Error();
