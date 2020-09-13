@@ -16,7 +16,6 @@ export const nothing = (..._args: any[]): any => null as any;
 type RequestDecoratorDefaults = { queries?: Queries; headers?: Headers };
 
 function requestDecorator(method: HttpMethod, endpoint: string, defaults?: RequestDecoratorDefaults): MethodDecorator {
-  // TODO: something to do with the original method value?
   return (target, propertyKey, descriptor: PropertyDescriptor): void => {
     // Print warnings if applicable
     if (Reflect.hasMetadata(MetadataKey.Request, target, propertyKey)) {
@@ -36,7 +35,7 @@ function requestDecorator(method: HttpMethod, endpoint: string, defaults?: Reque
     // - @Manipulate
     const manipulator: Manipulator | undefined = Reflect.getMetadata(MetadataKey.MethodManipulator, target, propertyKey);
 
-    // Build the generic Request object
+    // Build generic Request object
     const request = new RetroxiosRequest(method, endpoint).extendConfig(config);
     if (defaults) {
       defaults.queries && request.addQueries(defaults.queries);
@@ -45,10 +44,12 @@ function requestDecorator(method: HttpMethod, endpoint: string, defaults?: Reque
     request.withParametas(parametas, paramtypes);
     Reflect.defineMetadata(MetadataKey.Request, request, target, propertyKey);
 
-    // Modify the descriptor properties and its value to make it execute the request
+    // Modify descriptor properties
+    const func: Function = descriptor.value;
     descriptor.enumerable = true;
     descriptor.writable = descriptor.configurable = false;
     descriptor.value = async function (...args: any[]): Promise<unknown> {
+      func.call(target, ...args); // Call the original function without consuming it
       // Retrieve the Client object from metadata in runtime rather than in declaration time
       // as the object is defined in Retroxios.create() (after decorators are executed)
       const client: AxiosInstance = Reflect.getMetadata(MetadataKey.Client, target.constructor);
