@@ -1,8 +1,8 @@
 import { AxiosInstance, AxiosRequestConfig, AxiosResponse, Method } from "axios";
 
-import { Paramerator, Parameta, Queries, Headers } from "./entities";
+import { Headers, Paramerator, Parameta, Queries } from "./entities";
 
-const pathRegExp = (key: string): RegExp => new RegExp(`{${key}(?:=\\((.+)\\))?}`);
+const pathRegExp = (key?: string): RegExp => new RegExp(`{${key || ".+"}(?:=\\((.+)\\))?}`);
 
 type Requester = (...args: any[]) => Promise<AxiosResponse>;
 
@@ -37,28 +37,43 @@ export default class RetroxiosRequest {
     return this;
   }
 
-  public withParametas(parametas: Parameta[], paramtypes: FunctionConstructor[]): RetroxiosRequest {
-    this.parametas = parametas;
+  private checkBodyParametas(): void {
+    const hasBodyParameta = this.parametas.find((parameta) => parameta.operator === Paramerator.Body) !== undefined;
     // Disallow body for methods except POST, PUT, and PATCH
-    if (!this.parametas.every((parameta) => parameta.operator !== Paramerator.Body))
+    const methods = ["POST", "PUT", "PATCH"];
+    methods.push(...methods.map((method) => method.toLowerCase()));
+    if (hasBodyParameta && !methods.includes(this._config.method || ""))
       throw new Error("Body is only allowed in POST, PUT and PATCH methods");
-    // Validate every spread parametas for whether its type is spreadable (object instead of primitive)
+  }
+
+  private checkSpreadParametas(paramtypes: FunctionConstructor[]): void {
     const spreadParametas = this.parametas.filter((parameta) => {
       return [Paramerator.QuerySpread, Paramerator.HeaderSpread].includes(parameta.operator);
     });
+    // Check every spread parametas for whether its type is spreadable (object instead of primitive)
     for (const spreadParameta of spreadParametas) {
       const paramtypeName = paramtypes[spreadParameta.index].name;
       if (paramtypeName !== "Object") {
         throw new Error("Spread parameter must receive a spreadable Object value");
       }
     }
-    // Validate corresponding keys of the path parametas
+  }
+
+  private checkPathParametas(): void {
     const pathParametas = this.parametas.filter((parameta) => parameta.operator === Paramerator.Path);
+    // Check corresponding keys of the path parametas against replacement blocks
     for (const pathParameta of pathParametas) {
       const key = pathParameta.key;
       const match = this._config.url?.match(pathRegExp(key as string));
       if (!match) throw new Error(`Unable to find corresponding path key for '${key}'`);
     }
+  }
+
+  public withParametas(parametas: Parameta[], paramtypes: FunctionConstructor[]): RetroxiosRequest {
+    this.parametas = parametas;
+    this.checkBodyParametas();
+    this.checkPathParametas();
+    this.checkSpreadParametas(paramtypes);
     return this;
   }
 
