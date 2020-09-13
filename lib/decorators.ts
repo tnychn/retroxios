@@ -192,6 +192,7 @@ export const Path = (key: string): ParameterDecorator => {
  * @param key - The key of the query
  */
 export const Query = (key: string): ParameterDecorator => {
+  if (key.trim() === "") throw new Error("Key must not be empty");
   return (target, propertyKey, parameterIndex): void => {
     addMetadataParametas(target, propertyKey, { operator: Paramerator.Query, index: parameterIndex, key });
   };
@@ -210,6 +211,7 @@ export const QuerySpread: ParameterDecorator = (target, propertyKey, parameterIn
  * @param key - The key of the header entry
  */
 export const Header = (key: string): ParameterDecorator => {
+  if (key.trim() === "") throw new Error("Key must not be empty");
   return (target, propertyKey, parameterIndex): void => {
     addMetadataParametas(target, propertyKey, { operator: Paramerator.Header, index: parameterIndex, key });
   };
