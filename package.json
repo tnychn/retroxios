@@ -9,7 +9,7 @@
     "axios",
     "retrofit"
   ],
-  "repository": "github:strmbx/retroxios",
+  "repository": "github:tnychn/retroxios",
   "author": {
     "name": "Tony Chan",
     "email": "tonychan2342@gmail.com",

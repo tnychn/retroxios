@@ -5,10 +5,10 @@
 </p>
 
 <p align="center">
-    <a href="./package.json"><img alt="github package" src="https://img.shields.io/github/package-json/v/strmbx/retroxios"></a>
+    <a href="./package.json"><img alt="github package" src="https://img.shields.io/github/package-json/v/tnychn/retroxios"></a>
     <a href="https://www.npmjs.com/package/retroxios"><img alt="npm package" src="https://img.shields.io/npm/v/retroxios"></a>
     <a href="https://www.npmjs.com/package/retroxios"><img alt="npm downloads" src="https://img.shields.io/npm/dt/retroxios"></a>
-    <a href="./LICENSE.txt"><img alt="license" src="https://img.shields.io/github/license/strmbx/retroxios"></a>
+    <a href="./LICENSE.txt"><img alt="license" src="https://img.shields.io/github/license/tnychn/retroxios"></a>
 </p>
 
 **Retroxios** allows you to easily construct declarative yet flexible HTTP clients (powered by [axios](https://github.com/axios/axios))
