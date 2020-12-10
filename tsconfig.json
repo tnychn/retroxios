@@ -12,6 +12,6 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true
   },
-  "include": ["lib", "examples"],
+  "include": ["lib"],
   "exclude": ["node_modules"]
 }

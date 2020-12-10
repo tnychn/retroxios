@@ -17,8 +17,8 @@
   },
   "license": "MIT",
   "private": false,
-  "main": "build/lib/index.js",
-  "types": "build/lib/index.d.ts",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
   "files": [
     "build/lib",
     "README.md",
