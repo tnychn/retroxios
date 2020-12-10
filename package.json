@@ -1,6 +1,6 @@
 {
   "name": "retroxios",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "A type-safe HTTP client for Node.js and browsers.",
   "keywords": [
     "library",
