@@ -348,3 +348,12 @@ const subService = subBuilder.create(ExampleSubService);
 
 If you have any ideas on how to improve this project or if you think there is a lack of features,
 feel free to open an issue, or even better, open a pull request. All contributions are welcome!
+
+---
+
+<div align="center">
+  <sub><strong>Made with ♥︎ by tnychn</strong></sub>
+  <br>
+  <sub><strong>MIT © 2020 Tony Chan</strong></sub>
+</div>
+
