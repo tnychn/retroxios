@@ -354,6 +354,6 @@ feel free to open an issue, or even better, open a pull request. All contributio
 <div align="center">
   <sub><strong>Made with ♥︎ by tnychn</strong></sub>
   <br>
-  <sub><strong>MIT © 2020 Tony Chan</strong></sub>
+  <sub><strong>MIT © 2021 Tony Chan</strong></sub>
 </div>
 
