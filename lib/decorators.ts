@@ -31,17 +31,17 @@ function requestDecorator(method: HttpMethod, endpoint: string, defaults?: Reque
     const parametas: Parameta[] = Reflect.getMetadata(MetadataKey.RequestParametas, target, propertyKey) || [];
     const paramtypes: FunctionConstructor[] = Reflect.getMetadata("design:paramtypes", target, propertyKey);
     // - @Config
-    const config: AxiosRequestConfig = Reflect.getMetadata(MetadataKey.RequestConfig, target, propertyKey) || {};
+    const config: AxiosRequestConfig | undefined = Reflect.getMetadata(MetadataKey.RequestConfig, target, propertyKey);
     // - @Manipulate
     const manipulator: Manipulator | undefined = Reflect.getMetadata(MetadataKey.MethodManipulator, target, propertyKey);
 
     // Build generic Request object
-    const request = new RetroxiosRequest(method, endpoint).extendConfig(config);
+    const request = new RetroxiosRequest(method, endpoint).extendConfig(config || {});
     if (defaults) {
       defaults.queries && request.addQueries(defaults.queries);
       defaults.headers && request.addHeaders(defaults.headers);
     }
-    request.withParametas(parametas, paramtypes);
+    request.withParametas(parametas || [], paramtypes);
     Reflect.defineMetadata(MetadataKey.Request, request, target, propertyKey);
 
     // Modify descriptor properties
@@ -51,7 +51,7 @@ function requestDecorator(method: HttpMethod, endpoint: string, defaults?: Reque
     descriptor.value = async function (...args: any[]): Promise<unknown> {
       func.call(target, ...args); // Call the original function without consuming it
       // Retrieve the Client object from metadata in runtime rather than in declaration time
-      // as the object is defined in Retroxios.create() (after decorators are executed)
+      //  as the object is defined in Retroxios.create() (after decorators are executed)
       const client: AxiosInstance = Reflect.getMetadata(MetadataKey.Client, target.constructor);
       // Clone the Request object first before building to avoid side effects on the generic one
       const req = request.clone();

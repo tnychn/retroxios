@@ -11,7 +11,7 @@ export default class RetroxiosRequest {
   private _config: AxiosRequestConfig = { params: {}, headers: {} };
 
   public static fromConfig(config: AxiosRequestConfig): RetroxiosRequest {
-    if (!(config.method && config.url)) throw new Error();
+    if (!(config.method && config.url)) throw new Error("invalid config");
     return new RetroxiosRequest(config.method, config.url);
   }
 
@@ -46,6 +46,23 @@ export default class RetroxiosRequest {
       throw new Error("Body is only allowed in POST, PUT and PATCH methods");
   }
 
+  private checkPathParametas(): void {
+    const pathParametas = this.parametas.filter((parameta) => parameta.operator === Paramerator.Path);
+    // // Check replacement blocks against presence of path parametas
+    // let regexp = pathRegExp();
+    // regexp = new RegExp(regexp.source, regexp.flags + "g");
+    // const matches = this._config.url?.matchAll(regexp);
+    // for (const match of matches || []) {
+    //   console.log(match);
+    // }
+    // Check corresponding keys of the path parametas against replacement blocks
+    for (const pathParameta of pathParametas) {
+      const key = pathParameta.key;
+      const match = this._config.url?.match(pathRegExp(key as string));
+      if (!match) throw new Error(`Unable to find corresponding path key for '${key}'`);
+    }
+  }
+
   private checkSpreadParametas(paramtypes: FunctionConstructor[]): void {
     const spreadParametas = this.parametas.filter((parameta) => {
       return [Paramerator.QuerySpread, Paramerator.HeaderSpread].includes(parameta.operator);
@@ -59,16 +76,6 @@ export default class RetroxiosRequest {
     }
   }
 
-  private checkPathParametas(): void {
-    const pathParametas = this.parametas.filter((parameta) => parameta.operator === Paramerator.Path);
-    // Check corresponding keys of the path parametas against replacement blocks
-    for (const pathParameta of pathParametas) {
-      const key = pathParameta.key;
-      const match = this._config.url?.match(pathRegExp(key as string));
-      if (!match) throw new Error(`Unable to find corresponding path key for '${key}'`);
-    }
-  }
-
   public withParametas(parametas: Parameta[], paramtypes: FunctionConstructor[]): RetroxiosRequest {
     this.parametas = parametas;
     this.checkBodyParametas();
@@ -79,10 +86,10 @@ export default class RetroxiosRequest {
 
   private applyParameta(operator: Paramerator, arg: any, key?: string): void {
     // Don't skip if arg is not specified is resolving path
-    // as we still need to transform path templates to blank
+    //  as we still need to transform path templates to blank
     if (arg === undefined && ![Paramerator.Path].includes(operator)) return;
     // Resolve parametas based on their operators
-    // and apply the arguments to config
+    //  and apply the arguments to config
     switch (operator) {
       case Paramerator.Path: {
         // arg: >> string
