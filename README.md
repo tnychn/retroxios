@@ -135,7 +135,7 @@ returns `Promise<AxiosResponse<T>>` where `T` is the object type of the expected
 For example:
 
 ```typescript
-public async getUser(): Promise<AxiosResponse<UserResponse>>
+async getUser(): Promise<AxiosResponse<UserResponse>>
 ```
 
 #### Path Manipulation
@@ -146,7 +146,7 @@ A corresponding parameter must be decorated with `@Path("key")` using the same k
 
 ```typescript
 @GET("group/{id}/users")
-public async groupList(@Path("id") groupID: number): Promise<AxiosResponse> {
+async groupList(@Path("id") groupID: number): Promise<AxiosResponse> {
   return nothing(groupID);
 };
 ```
@@ -156,7 +156,7 @@ by using the syntax `{key=(default)}`, where the default value is surrounded by 
 
 ```typescript
 @GET("group/{id=(999)}/users")
-public async groupList(@Path("id") groupID = 999): Promise<AxiosResponse> {
+async groupList(@Path("id") groupID = 999): Promise<AxiosResponse> {
   return nothing(groupID);
 };
 ```
@@ -167,7 +167,7 @@ Queries can be added using the `@Query("key")` parameter decorator like this:
 
 ```typescript
 @GET("group/{id}/users")
-public async groupList(
+async groupList(
   @Path("id") groupID: number,
   @Query("sort") sort: string
 ): Promise<AxiosResponse> {
@@ -179,7 +179,7 @@ For complex query combinations, the `@QuerySpread` parameter decorator can be us
 
 ```typescript
 @GET("group/{id}/users")
-public async groupList(
+async groupList(
   @Path("id") groupID: number,
   @QuerySpread options: Options
 ): Promise<AxiosResponse> {
@@ -193,7 +193,7 @@ Headers can be added using the `@Header("key")` parameter decorator like this:
 
 ```typescript
 @GET("group")
-public async getGroup(@Header("Authorization") authorization: string): Promise<AxiosResponse> {
+async getGroup(@Header("Authorization") authorization: string): Promise<AxiosResponse> {
   return nothing(authorization);
 };
 ```
@@ -202,7 +202,7 @@ For complex query combinations, the `@HeaderSpread` parameter decorator can be u
 
 ```typescript
 @GET("group")
-public async getGroup(@HeaderSpread headers: GroupHeaders): Promise<AxiosResponse> {
+async getGroup(@HeaderSpread headers: GroupHeaders): Promise<AxiosResponse> {
   return nothing(headers);
 };
 ```
@@ -213,7 +213,7 @@ You can supply a data body to the request using the `@Body` parameter decorator 
 
 ```typescript
 @POST("users/new")
-public async createUser(@Body user: UserEntity): Promise<AxiosResponse> {
+async createUser(@Body user: UserEntity): Promise<AxiosResponse> {
   return nothing(user);
 };
 ```
@@ -227,7 +227,7 @@ You can supply an additional config (`AxiosRequestConfig`) for a particular requ
 ```typescript
 @GET("user/posts")
 @Config({ ... })
-public async getUserPosts(): Promise<AxiosResponse> {
+async getUserPosts(): Promise<AxiosResponse> {
   return nothing();
 };
 ```
@@ -247,7 +247,7 @@ even change the return type of the decorated request method (such as wrap the re
 ```typescript
 @GET("user/posts")
 @Manipulate((response: AxiosResponse): string => response.statusText})
-public async getUserPosts(): Promise<string> {
+async getUserPosts(): Promise<string> {
   return nothing();
 };
 ```
@@ -356,4 +356,3 @@ feel free to open an issue, or even better, open a pull request. All contributio
   <br>
   <sub><strong>MIT © 2021 Tony Chan</strong></sub>
 </div>
-
