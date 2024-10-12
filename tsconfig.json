@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "outDir": "build",
+    "lib": ["esnext", "dom"],
+    "strict": true,
+    "sourceMap": true,
+    "declaration": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true
+  },
+  "include": ["lib"],
+  "exclude": ["node_modules"]
+}

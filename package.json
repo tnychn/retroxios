@@ -1,0 +1,80 @@
+{
+  "name": "retroxios",
+  "version": "0.4.3",
+  "description": "A type-safe HTTP client for Node.js and browsers.",
+  "keywords": [
+    "library",
+    "decorators",
+    "http",
+    "axios",
+    "retrofit"
+  ],
+  "repository": "github:tnychn/retroxios",
+  "author": {
+    "name": "Tony Chan",
+    "email": "tnychn@protonmail.com",
+    "url": "https://github.com/tnychn"
+  },
+  "license": "MIT",
+  "private": false,
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "files": [
+    "build",
+    "README.md",
+    "LICENSE.txt"
+  ],
+  "scripts": {
+    "prepare": "tsc"
+  },
+  "dependencies": {
+    "axios": "^0.21.1",
+    "reflect-metadata": "^0.1.13"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.20",
+    "@typescript-eslint/eslint-plugin": "^4.13.0",
+    "@typescript-eslint/parser": "^4.13.0",
+    "eslint": "^7.17.0",
+    "eslint-config-prettier": "^8.0.0",
+    "prettier": "^2.2.1",
+    "typescript": "^4.1.3"
+  },
+  "prettier": {
+    "tabWidth": 2,
+    "printWidth": 125
+  },
+  "eslintConfig": {
+    "env": {
+      "es6": true,
+      "node": true,
+      "browser": true
+    },
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+      "ecmaVersion": 6,
+      "sourceType": "module"
+    },
+    "plugins": [
+      "@typescript-eslint"
+    ],
+    "extends": [
+      "eslint:recommended",
+      "prettier",
+      "plugin:@typescript-eslint/recommended"
+    ],
+    "rules": {
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/ban-types": [
+        "error",
+        {
+          "types": {
+            "object": false,
+            "Function": false
+          },
+          "extendDefaults": true
+        }
+      ]
+    }
+  }
+}
